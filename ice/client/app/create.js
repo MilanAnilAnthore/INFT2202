@@ -58,21 +58,65 @@ async function submitAnimalForm ( event ) {
 }
 
 // validate the animal form
-function validateAnimalForm ( form ) {
-    console.log('validating')
+function validateAnimalForm(form) {
+    console.log('validating');
     let valid = true;
-    // test that name is valid
-    const name = form.name.value;
-    const eleNameError = form.name.nextElementSibling
-    if (name == "") {
+
+    // Validate Name
+    const name = form.name.value.trim();
+    const eleNameError = form.name.nextElementSibling;
+    if (name === "") {
         eleNameError.classList.remove('d-none');
         eleNameError.textContent = "You must name this animal!";
         valid = false;
     } else {
         eleNameError.classList.add('d-none');
     }
-    // add validation for the remaining fields. 
 
-    // return if the form is valid or not
-    return valid
+    // Validate Breed
+    const breed = form.breed.value.trim();
+    const eleBreedError = form.breed.nextElementSibling;
+    if (breed === "") {
+        eleBreedError.classList.remove('d-none');
+        eleBreedError.textContent = "You must specify the breed!";
+        valid = false;
+    } else {
+        eleBreedError.classList.add('d-none');
+    }
+
+    // Validate Number of Eyes
+    const eyes = form.eyes.value.trim();
+    const eleEyesError = form.eyes.nextElementSibling;
+    if (eyes === "" || isNaN(eyes) || Number(eyes) < 0) {
+        eleEyesError.classList.remove('d-none');
+        eleEyesError.textContent = "Please enter a valid number of eyes (0 or greater)!";
+        valid = false;
+    } else {
+        eleEyesError.classList.add('d-none');
+    }
+
+    // Validate Number of Legs
+    const legs = form.legs.value.trim();
+    const eleLegsError = form.legs.nextElementSibling;
+    if (legs === "" || isNaN(legs) || Number(legs) < 0) {
+        eleLegsError.classList.remove('d-none');
+        eleLegsError.textContent = "Please enter a valid number of legs (0 or greater)!";
+        valid = false;
+    } else {
+        eleLegsError.classList.add('d-none');
+    }
+
+    // Validate Sound
+    const sound = form.sound.value.trim();
+    const eleSoundError = form.sound.nextElementSibling;
+    if (sound === "") {
+        eleSoundError.classList.remove('d-none');
+        eleSoundError.textContent = "You must specify the sound this animal makes!";
+        valid = false;
+    } else {
+        eleSoundError.classList.add('d-none');
+    }
+
+    // Return if the form is valid or not
+    return valid;
 }
