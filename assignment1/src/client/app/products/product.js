@@ -7,5 +7,4 @@ function Product(name, description, stock, price) {
     this.price = price;
 }
 
-// Export the Product class
 export default Product;

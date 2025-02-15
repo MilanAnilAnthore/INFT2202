@@ -4,6 +4,7 @@ import Product from './product.js';
 
 const params = new URLSearchParams(window.location.search);
 const editId = params.get('edit');
+let currentProduct = null;
 
 // Function to validate the form
 function validateForm(name, description, stock, price) {
@@ -66,9 +67,9 @@ function autoFillForm(product) {
 
 // Auto-fill the form if editing
 if (editId) {
-    const product = ProductService.getProducts().find(p => p.id === editId);
-    if (product) {
-        autoFillForm(product);
+    currentProduct = ProductService.getProducts().find(p => p.id === editId);
+    if (currentProduct) {
+        autoFillForm(currentProduct);
     }
 }
 
@@ -89,14 +90,14 @@ document.getElementById('create-product-form').addEventListener('submit', functi
     const newProduct = new Product(name, description, stock, price);
 
     if (editId) {
-        // Update existing product
+        // Preserve the original ID when updating
+        newProduct.id = editId;
         ProductService.updateProduct(editId, newProduct);
         alert('Product updated successfully!');
     } else {
-        // Add new product
         ProductService.addProduct(newProduct);
         alert('Product created successfully!');
     }
 
-    window.location.href = 'search.html';
+    window.location.href = 'list.html';
 });

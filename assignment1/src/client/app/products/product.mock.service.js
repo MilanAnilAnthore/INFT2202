@@ -3,14 +3,17 @@ import Product from './product.js';
 
 class ProductService {
     constructor() {
-        this.products = this.loadProducts(); // Load products from local storage
+        this.products = this.loadProducts();
     }
 
-    // Load products from local storage and convert them to Product instances
     loadProducts() {
         const products = localStorage.getItem('products');
         const parsedProducts = products ? JSON.parse(products) : [];
-        return parsedProducts.map(p => new Product(p.name, p.description, p.stock, p.price));
+        return parsedProducts.map(p => {
+            const product = new Product(p.name, p.description, p.stock, p.price);
+            product.id = p.id; // Preserve the original ID
+            return product;
+        });
     }
 
     // Save products to local storage
@@ -46,3 +49,4 @@ class ProductService {
 
 // Export the service
 export default new ProductService();
+
