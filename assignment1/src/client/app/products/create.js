@@ -50,17 +50,41 @@ function validateForm(name, description, stock, price) {
     } else if (price < 0) {
         document.getElementById('productPriceError').textContent = 'Price must be a positive number.';
         isValid = false;
+    } else if (!(/^\d+(\.\d{1,2})?$/).test(price.toString())) {
+        document.getElementById('productPriceError').textContent = 'Price must have up to 2 decimal places.';
+        isValid = false;
     }
 
     return isValid;
 }
+
+// Add input event listener for price field to enforce decimal format
+document.getElementById('productPrice').addEventListener('input', function(e) {
+    let value = e.target.value;
+    
+    // Remove any characters that aren't numbers or decimal point
+    value = value.replace(/[^\d.]/g, '');
+    
+    // Ensure only one decimal point
+    const parts = value.split('.');
+    if (parts.length > 2) {
+        value = parts[0] + '.' + parts.slice(1).join('');
+    }
+    
+    // Limit to 2 decimal places
+    if (parts.length > 1) {
+        value = parts[0] + '.' + parts[1].slice(0, 2);
+    }
+    
+    e.target.value = value;
+});
 
 // Function to auto-fill the form when editing
 function autoFillForm(product) {
     document.getElementById('productName').value = product.name;
     document.getElementById('productDescription').value = product.description;
     document.getElementById('productStock').value = product.stock;
-    document.getElementById('productPrice').value = product.price;
+    document.getElementById('productPrice').value = product.price.toFixed(2); // Ensure price shows 2 decimal places
     document.querySelector('h1').textContent = 'Edit Product';
     document.querySelector('button[type="submit"]').textContent = 'Save Changes';
 }
