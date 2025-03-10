@@ -1,10 +1,10 @@
-import ProductService from './product.mock.service.js';
+import ProductService from './product.service.js';
 
 class ProductList {
     constructor() {
         this.products = [];
         this.currentPage = 1;
-        this.itemsPerPage = 10;
+        this.itemsPerPage = 5; // Changed to 5 to match API default
         this.productList = document.querySelector('#product-list tbody');
         this.paginationElement = document.getElementById('pagination');
         this.itemsPerPageSelect = document.getElementById('itemsPerPage');
@@ -73,51 +73,56 @@ class ProductList {
     async loadProducts() {
         try {
             this.showSpinner();
+            console.log('Fetching products from:', ProductService.host); // Debug line
             const response = await ProductService.getProducts(this.currentPage, this.itemsPerPage);
-            this.products = response.products;
-            this.totalItems = response.total;
+            console.log('Raw API Response:', response); // Debug line
+
+            if (!response) {
+                throw new Error('No response from API');
+            }
+
+            this.products = response.products || [];
+            this.totalItems = response.total || 0;
+            this.totalPages = response.totalPages || 1;
+
+            console.log('Processed products:', this.products); // Debug line
             this.render();
             this.hideSpinner();
         } catch (error) {
+            console.error('Detailed error:', error);
             this.hideSpinner();
             this.showMessage('Error loading products: ' + error.message, 'danger');
         }
     }
 
-    formatDate(dateString) {
-        return new Date(dateString).toLocaleString();
-    }
-
     renderProducts() {
-        const currentProducts = this.getCurrentPageProducts();
-        const currentUser = 'current_user'; // Match the mock service's owner value
-
-        if (this.products.length === 0) {
+        if (!this.products || this.products.length === 0) {
             this.productList.innerHTML = '<tr><td colspan="7" class="text-center">No products available.</td></tr>';
             return;
         }
 
         this.productList.innerHTML = '';
-        currentProducts.forEach(product => {
+        this.products.forEach(product => {
+            console.log('Rendering product:', product); // Debug line
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${product.name}</td>
-                <td>${product.description}</td>
-                <td>${product.stock}</td>
-                <td>$${product.price.toFixed(2)}</td>
-                <td>${product.owner || 'Unknown'}</td>
-                <td>${this.formatDate(product.createdAt)}</td>
+                <td>${product.name || 'N/A'}</td>
+                <td>${product.description || 'N/A'}</td>
+                <td>${product.sound || 'N/A'}</td>
+                <td>$${product.price || '0'}</td>
+                <td>${product.user || 'N/A'}</td>
+                <td>${product.createTime ? new Date(product.createTime * 1000).toLocaleString() : 'N/A'}</td>
                 <td>
-                    ${product.owner === currentUser ? `
+                    ${product.user === 'your student id' ? `
                         <button class="btn btn-warning btn-sm edit-btn" data-id="${product.id}">Update</button>
                         <button class="btn btn-danger btn-sm delete-btn" data-id="${product.id}">Delete</button>
                     ` : ''}
                 </td>
             `;
 
-            if (product.owner === currentUser) {
-                row.querySelector('.edit-btn').addEventListener('click', () => this.editProduct(product.id));
-                row.querySelector('.delete-btn').addEventListener('click', () => this.showDeleteModal(product.id));
+            if (product.user === 'your student id') {
+                row.querySelector('.edit-btn')?.addEventListener('click', () => this.editProduct(product.id));
+                row.querySelector('.delete-btn')?.addEventListener('click', () => this.showDeleteModal(product.id));
             }
 
             this.productList.appendChild(row);
