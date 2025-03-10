@@ -102,4 +102,3 @@ class ProductService {
 // Fix: Create an instance and export it as default
 const productService = new ProductService();
 export default productService;
-
