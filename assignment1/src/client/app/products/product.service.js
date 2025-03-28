@@ -1,6 +1,6 @@
 class ProductService {
     constructor() {
-        this.host = 'https://inft2202-server.onrender.com/api/products';
+        this.host = 'http://localhost:3000/api/products';
     }
 
     async getProducts(page = 1, perPage = 5) {
@@ -80,6 +80,77 @@ class ProductService {
             throw new Error(`Failed to delete product: ${error.message}`);
         }
     }
+
+    async getProductByName(name) {
+        try {
+            const url = `${this.host}/name/${encodeURIComponent(name)}`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            throw new Error(`Failed to fetch product: ${error.message}`);
+        }
+    }
+
+    async updateProductByName(name, product) {
+        try {
+            const url = `${this.host}/name/${encodeURIComponent(name)}`;
+            const request = new Request(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                mode: 'cors',
+                body: JSON.stringify({
+                    name: product.name,
+                    description: product.description,
+                    price: parseFloat(product.price),
+                    stock: parseInt(product.stock)
+                })
+            });
+
+            const response = await fetch(request);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            throw new Error(`Failed to update product: ${error.message}`);
+        }
+    }
+
+    async deleteProductByName(name) {
+        try {
+            const url = `${this.host}/name/${encodeURIComponent(name)}`;
+            const request = new Request(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                mode: 'cors'
+            });
+
+            const response = await fetch(request);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.status === 204 ? null : await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            throw new Error(`Failed to delete product: ${error.message}`);
+        }
+    }
 }
 
 export default new ProductService();
+
+
+

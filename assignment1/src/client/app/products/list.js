@@ -187,7 +187,15 @@ class ProductList {
         try {
             this.showSpinner();
             await new Promise(resolve => setTimeout(resolve, 1000));
-            await ProductService.deleteProduct(this.productToDelete);
+
+            // If productToDelete is an ID, use deleteProduct
+            // If it's a name, use deleteProductByName
+            if (typeof this.productToDelete === 'string' && !this.productToDelete.match(/^[0-9a-fA-F]{24}$/)) {
+                await ProductService.deleteProductByName(this.productToDelete);
+            } else {
+                await ProductService.deleteProduct(this.productToDelete);
+            }
+
             await this.loadProducts();
             this.showMessage('Product deleted successfully');
         } catch (error) {
